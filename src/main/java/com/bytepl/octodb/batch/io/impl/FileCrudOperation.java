@@ -8,6 +8,7 @@ import com.bytepl.octodb.batch.model.DataBase;
 import com.bytepl.octodb.batch.model.Document;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,6 +20,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
+@Scope
 public class FileCrudOperation implements CrudOperation {
     @Value("${octa-db.path.name}")
     private String path_name;
@@ -33,9 +35,10 @@ public class FileCrudOperation implements CrudOperation {
 
                 if (file.exists()){
                     DataBase dataBase = new DataBase();
+                    DataBase.setPath(path_name);
                     dataBase.setName(name);
                     dataBase.setDate(new Date());
-                    dataBase.setCollections(new CollectionTransaction<Collection>());
+                    dataBase.setCollections(null);
                     dataBaseMonoSink.success(dataBase);
                 } else {
                     dataBaseMonoSink.error(new NotCreatedException("La base de datos no existe"));
@@ -77,7 +80,7 @@ public class FileCrudOperation implements CrudOperation {
                 collection.setDate(new Date());
                 collection.setName(name);
                 collection.setDescription(descripcion);
-                collection.setDocuments(new ArrayList<>());
+                collection.setDocuments(new CollectionTransaction(path_name, dataBase, collection));
 
                 ObjectMapper objectMapper = new ObjectMapper();
 
@@ -126,7 +129,7 @@ public class FileCrudOperation implements CrudOperation {
     public Mono<Document> updateDocument(DataBase dataBase, Collection collection, Document document) {
         return Mono.create(documentMonoSink -> {
             File file = new File(path_name +
-                    dataBase.getName() + "/" + collection.getName() + "/" + document.get("_id") + ".json");
+                    dataBase.getName() + "/" + collection.getName() + "/" + document.get("_id").toString() + ".json");
             try {
                 new ObjectMapper()
                         .writeValue(file, document);
@@ -159,8 +162,9 @@ public class FileCrudOperation implements CrudOperation {
                 for (String name:
                      file.list()) {
                     DataBase dataBase = new DataBase();
+                    DataBase.setPath(path_name);
                     dataBase.setName(name);
-                    dataBase.setCollections(new CollectionTransaction<Collection>());
+                    dataBase.setCollections(null);
                     dataBase.setDate(new Date());
 
                     dataBaseFluxSink.next(dataBase);

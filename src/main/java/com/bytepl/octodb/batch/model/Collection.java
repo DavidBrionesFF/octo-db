@@ -1,15 +1,16 @@
 package com.bytepl.octodb.batch.model;
 
-import com.bytepl.octodb.batch.io.util.CollectionTransaction;
+import com.bytepl.octodb.batch.io.util.CollectionOperation;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 public class Collection implements Serializable {
     private String name;
     private String description;
-    private List<Document> documents = new CollectionTransaction<>();
+    @JsonIgnore
+    private CollectionOperation<Document> documents = null;
     private Date date;
 
     public String getName() {
@@ -20,11 +21,11 @@ public class Collection implements Serializable {
         this.name = name;
     }
 
-    public List<Document> getDocuments() {
+    public CollectionOperation<Document> getDocuments() {
         return documents;
     }
 
-    public void setDocuments(List<Document> documents) {
+    public void setDocuments(CollectionOperation<Document> documents) {
         this.documents = documents;
     }
 

@@ -2,12 +2,15 @@ package com.bytepl.octodb;
 
 import com.bytepl.octodb.batch.io.impl.FileCrudOperation;
 import com.bytepl.octodb.batch.model.Document;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.io.IOException;
 
 @SpringBootApplication
 public class App implements CommandLineRunner {
@@ -75,6 +78,20 @@ public class App implements CommandLineRunner {
 		fileCrudOperation.findDatabases()
 				.subscribe(dataBase -> {
 					logger.info("La base de datos se cargo " + dataBase.getName());
+
+					try {
+						dataBase.getCollections().forEach(collection -> {
+							logger.info("La collecion se cargo " + collection.getName());
+
+							collection.getDocuments()
+									.findAll()
+									.subscribe(o -> {
+										logger.info("Se encontro el id " + o.get("_id"));
+									});
+						});
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				});
 	}
 }
