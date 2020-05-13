@@ -1,5 +1,7 @@
 package com.bytepl.octodb.batch.model;
 
+import com.bytepl.octodb.batch.io.util.CollectionTransaction;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -7,7 +9,7 @@ import java.util.List;
 public class Collection implements Serializable {
     private String name;
     private String description;
-    private List<Document> documents;
+    private List<Document> documents = new CollectionTransaction<>();
     private Date date;
 
     public String getName() {
