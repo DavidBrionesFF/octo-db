@@ -52,22 +52,21 @@ public class DataBase {
     }
 
     public List<Collection> getCollections() throws IOException {
-        if (this.collections == null){
-            File file = new File(path + name);
+        File file = new File(path + name);
 
-            ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
 
-            this.collections = new ArrayList<>();
+        this.collections = new ArrayList<>();
 
-            for (String name : file.list()){
-                File file_collection =
-                        new File(path + getName() + "/" + name + "/colection_descriptor.json");
-                Collection collection = objectMapper.readValue(file_collection, Collection.class);
-                collection.setDocuments(new CollectionTransaction(path, this, collection));
-                this.collections.add(collection);
-            }
+        for (String name : file.list()){
+            File file_collection =
+                    new File(path + getName() + "/" + name + "/colection_descriptor.json");
+            Collection collection = objectMapper.readValue(file_collection, Collection.class);
+            collection.setDocuments(new CollectionTransaction(path, this, collection));
+            this.collections.add(collection);
         }
-        return collections;
+
+        return this.collections;
     }
 
     public void setCollections(List<Collection> collections) {

@@ -178,6 +178,20 @@ public class FileCrudOperation implements CrudOperation {
 
     @Override
     public Mono<DataBase> findDatabasesByName(String name) {
-        return null;
+        return Mono.create(dataBaseMonoSink -> {
+            File file = new File(path_name + name);
+            if (file.isDirectory()){
+                DataBase dataBase = new DataBase();
+                DataBase.setPath(path_name);
+                dataBase.setName(name);
+                dataBase.setCollections(null);
+                dataBase.setDate(new Date());
+
+
+                dataBaseMonoSink.success(dataBase);
+            }else {
+                dataBaseMonoSink.error(new Exception("El directorio que especifico no es un directorio"));
+            }
+        });
     }
 }

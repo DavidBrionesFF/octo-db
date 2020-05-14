@@ -83,10 +83,14 @@ public class App implements CommandLineRunner {
 						dataBase.getCollections().forEach(collection -> {
 							logger.info("La collecion se cargo " + collection.getName());
 
-							collection.getDocuments()
-									.findAll()
-									.subscribe(o -> {
-										logger.info("Se encontro el id " + o.get("_id"));
+//							collection.getDocuments()
+//									.findAll()
+//									.subscribe(o -> {
+//										logger.info("Se encontro el id " + o.get("_id"));
+//									});
+							collection.getDocuments().countAll()
+									.subscribe(aLong -> {
+										logger.info("La cantidad de documentos encontrada es " + aLong);
 									});
 						});
 					} catch (IOException e) {
