@@ -25,56 +25,56 @@ public class App implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		fileCrudOperation.createDataBase("bytecode")
-				.doOnError(throwable -> {
-					logger.error(throwable);
-				})
-				.subscribe(dataBase -> {
-					logger.info("La base de datos fue creada");
-
-					fileCrudOperation.createCollection(dataBase, "users", "user")
-							.doOnError(throwable -> {
-								logger.error(throwable);
-							})
-							.subscribe(collection -> {
-								for (int i = 0; i <=100; i++){
-									Document document = new Document();
-
-									document.put("_name", "Jose David " + i);
-									document.put("_last_name", "Briones Rosa " + i);
-
-									fileCrudOperation.createDocument(dataBase, collection, document)
-											.doOnError(throwable -> {
-												logger.error(throwable);
-											})
-											.subscribe(document1 -> {
-												logger.info("El documento esta creado _id=" + document1.get("_id") + "_collection=" +collection.getName());
-											});
-								}
-							});
-
-
-					fileCrudOperation.createCollection(dataBase, "todo", "todo")
-							.doOnError(throwable -> {
-								logger.error(throwable);
-							})
-							.subscribe(collection -> {
-								for (int i = 0; i <=100; i++){
-									Document document = new Document();
-
-									document.put("_name", "Todo" + i);
-									document.put("_description", "Todo description " + i);
-
-									fileCrudOperation.createDocument(dataBase, collection, document)
-											.doOnError(throwable -> {
-												logger.error(throwable);
-											})
-											.subscribe(document1 -> {
-												logger.info("El documento esta creado _id=" + document1.get("_id") + "_collection=" +collection.getName());
-											});
-								}
-							});
-				});
+//		fileCrudOperation.createDataBase("bytecode")
+//				.doOnError(throwable -> {
+//					logger.error(throwable);
+//				})
+//				.subscribe(dataBase -> {
+//					logger.info("La base de datos fue creada");
+//
+//					fileCrudOperation.createCollection(dataBase, "users", "user")
+//							.doOnError(throwable -> {
+//								logger.error(throwable);
+//							})
+//							.subscribe(collection -> {
+//								for (int i = 0; i <=100; i++){
+//									Document document = new Document();
+//
+//									document.put("_name", "Jose David " + i);
+//									document.put("_last_name", "Briones Rosa " + i);
+//
+//									fileCrudOperation.createDocument(dataBase, collection, document)
+//											.doOnError(throwable -> {
+//												logger.error(throwable);
+//											})
+//											.subscribe(document1 -> {
+//												logger.info("El documento esta creado _id=" + document1.get("_id") + "_collection=" +collection.getName());
+//											});
+//								}
+//							});
+//
+//
+//					fileCrudOperation.createCollection(dataBase, "todo", "todo")
+//							.doOnError(throwable -> {
+//								logger.error(throwable);
+//							})
+//							.subscribe(collection -> {
+//								for (int i = 0; i <=100; i++){
+//									Document document = new Document();
+//
+//									document.put("_name", "Todo" + i);
+//									document.put("_description", "Todo description " + i);
+//
+//									fileCrudOperation.createDocument(dataBase, collection, document)
+//											.doOnError(throwable -> {
+//												logger.error(throwable);
+//											})
+//											.subscribe(document1 -> {
+//												logger.info("El documento esta creado _id=" + document1.get("_id") + "_collection=" +collection.getName());
+//											});
+//								}
+//							});
+//				});
 
 //		fileCrudOperation.findDatabases()
 //				.subscribe(dataBase -> {

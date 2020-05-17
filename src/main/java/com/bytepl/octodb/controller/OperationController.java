@@ -8,7 +8,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -95,6 +94,22 @@ public class OperationController {
                 .existsById(id);
     }
 
+    /*Actualizar datos*/
+    @PutMapping("/{database}/collection/{collection}/document")
+    public Mono updateDocument(@PathVariable String database,
+                               @PathVariable String collection,
+                               @RequestBody Document document) throws IOException {
+        DataBase dataBase = new DataBase();
+        dataBase.setPath(path);
+        dataBase.setName(database);
+        dataBase.setDate(new Date());
+        Collection collection1 = crudOperation.findCollectionByDataBaseAndName(database, collection);
+        return collection1
+                .getDocuments()
+                .update(document);
+    }
+
+    /*Crear datos*/
     @PostMapping("/{database}")
     public Mono createDatabase(@PathVariable String database){
         return crudOperation.createDataBase(database);
