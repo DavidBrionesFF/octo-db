@@ -194,4 +194,21 @@ public class FileCrudOperation implements CrudOperation {
             }
         });
     }
+
+    @Override
+    public Collection findCollectionByDataBaseAndName(String database, String name) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        DataBase dataBase = new DataBase();
+        DataBase.setPath(path_name);
+        dataBase.setName(database);
+        dataBase.setCollections(null);
+        dataBase.setDate(new Date());
+
+        File file_collection =
+                new File(path_name + database + "/" + name + "/colection_descriptor.json");
+        Collection collection = objectMapper.readValue(file_collection, Collection.class);
+        collection.setDocuments(new CollectionTransaction(path_name, dataBase, collection));
+        return collection;
+    }
 }

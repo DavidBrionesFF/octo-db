@@ -6,6 +6,8 @@ import com.bytepl.octodb.batch.model.Document;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+
 public interface CrudOperation {
     public Mono<DataBase> createDataBase(String name);
     public Mono<Boolean> dropDataBase(DataBase dataBase);
@@ -29,4 +31,6 @@ public interface CrudOperation {
 
     public Flux<DataBase> findDatabases();
     public Mono<DataBase> findDatabasesByName(String name);
+
+    public Collection findCollectionByDataBaseAndName(String database, String name) throws IOException;
 }

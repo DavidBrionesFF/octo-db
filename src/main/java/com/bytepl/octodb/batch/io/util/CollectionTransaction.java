@@ -4,6 +4,8 @@ import com.bytepl.octodb.batch.model.Collection;
 import com.bytepl.octodb.batch.model.DataBase;
 import com.bytepl.octodb.batch.model.Document;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -11,7 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-public class CollectionTransaction implements  CollectionOperation<Document>{
+public class CollectionTransaction implements CollectionOperation<Document>{
+    private static final Log logger = LogFactory.getLog(CollectionTransaction.class);
     private String path;
     private DataBase database;
     private Collection collection;
@@ -19,11 +22,16 @@ public class CollectionTransaction implements  CollectionOperation<Document>{
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public CollectionTransaction(String path, DataBase dataBase, Collection collection) {
+        logger.info("Conectando a la coleccion " + collection.getName() + " de la base de datos " + dataBase.getName());
         this.database = dataBase;
         this.collection = collection;
         this.path = path;
         file_collection = new File(path +
                 database.getName() + "/" + collection.getName() + "/");
+        countAll()
+                .subscribe(aLong -> {
+                    logger.debug(String.format("Coleccion cargada %s exitosamente, contiene %d ", collection.getName(), aLong) );
+                });
     }
 
     public CollectionTransaction() {
@@ -67,14 +75,15 @@ public class CollectionTransaction implements  CollectionOperation<Document>{
         return Flux.create(fluxSink -> {
             for (File document : file_collection.listFiles()){
                 try {
-                    fluxSink.next(objectMapper.readValue(document, Document.class));
+                    if (!document.getName().contains("colection_descriptor")){
+                        Document document1 = objectMapper.readValue(document, Document.class);
+                        fluxSink.next(document1);
+                    }
                 } catch (IOException e) {
                     fluxSink.error(e);
                 }
             }
             fluxSink.complete();
-        }).filter(o -> {
-            return ((Document) o).get("colection_descriptor") != null;
         }).map(o -> {
             return ((Document) o);
         });
@@ -83,7 +92,7 @@ public class CollectionTransaction implements  CollectionOperation<Document>{
     @Override
     public Mono<Document> findById(String _id) {
         return Mono.create(monoSink -> {
-            File file = new File(this.file_collection.getAbsolutePath() + _id + ".json");
+            File file = new File(this.file_collection.getAbsolutePath() + "/" + _id + ".json");
             try {
                 monoSink.success(objectMapper.readValue(file, Document.class));
             } catch (IOException e) {
@@ -112,6 +121,7 @@ public class CollectionTransaction implements  CollectionOperation<Document>{
                     fluxSink.next(document.delete());
                 }
             }
+            logger.warn("Se eleminaron todos los documentos de la coleccion " + collection.getName() + " de la base de datos " + database.getName());
             fluxSink.complete();
         });
     }
