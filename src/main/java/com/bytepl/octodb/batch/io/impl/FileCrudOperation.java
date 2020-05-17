@@ -7,6 +7,7 @@ import com.bytepl.octodb.batch.model.Collection;
 import com.bytepl.octodb.batch.model.DataBase;
 import com.bytepl.octodb.batch.model.Document;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -58,6 +59,7 @@ public class FileCrudOperation implements CrudOperation {
                 file.mkdir();
 
                 if (file.exists()){
+                    FileUtils.deleteDirectory(file);
                     dataBaseMonoSink.success(true);
                 } else {
                     dataBaseMonoSink.error(new NotCreatedException("La base de datos no existe"));
@@ -99,8 +101,8 @@ public class FileCrudOperation implements CrudOperation {
     public Mono<Boolean> dropColection(DataBase dataBase, Collection collection) {
         return Mono.create(dataBaseMonoSink -> {
             try{
-                File file = new File(path_name + dataBase.getName() + "/" + collection.getName());
-                file.delete();
+                File file = new File(path_name + dataBase.getName() + "/" + collection.getName() + "/");
+                FileUtils.deleteDirectory(file);
                 dataBaseMonoSink.success(true);
             }catch (Exception e){
                 dataBaseMonoSink.error(new NotCreatedException("La base de datos no se elimino porque no tiene permisos"));

@@ -2,6 +2,7 @@ package com.bytepl.octodb.batch.model;
 
 import com.bytepl.octodb.batch.io.util.CollectionOperation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -11,7 +12,8 @@ public class Collection implements Serializable {
     private String description;
     @JsonIgnore
     private CollectionOperation<Document> documents = null;
-    private Date date;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private Date date = new Date();
 
     public String getName() {
         return name;

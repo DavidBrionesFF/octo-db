@@ -28,11 +28,13 @@ public class OperationController {
     @Autowired
     private CrudOperation crudOperation;
 
+    /* Obtener la base de datos*/
     @GetMapping("/findAll")
     public Flux<DataBase> findAllDatabase(){
         return crudOperation.findDatabases();
     }
 
+    /* Obtener las colecciones*/
     @GetMapping("/{databaseName}/collection/findAll")
     public Mono<List<Collection>> findCollectionByDatabase(
             @PathVariable String databaseName
@@ -49,6 +51,7 @@ public class OperationController {
                 });
     }
 
+    /* Obteniendo todas las documentos*/
     @GetMapping("/{databaseName}/collection/{collectionname}/findAll")
     public Flux findAllDocumentByCollectionAndDataBase(
             @PathVariable String databaseName,
@@ -59,6 +62,7 @@ public class OperationController {
                 .findAll();
     }
 
+    /* Obtenido documentos por Id*/
     @GetMapping("/{databaseName}/collection/{collectionname}/findById/{id}")
     public Mono<Document> findAllDocumentByCollectionAndDataBaseAndIdDocument(
             @PathVariable String databaseName,
@@ -68,6 +72,54 @@ public class OperationController {
         return crudOperation.findCollectionByDataBaseAndName(databaseName, collectionname)
                 .getDocuments()
                 .findById(id);
+    }
+
+    @GetMapping("/{databaseName}/collection/{collectionname}/countAll")
+    public Mono<Long> countAllDocumentByCollectionAndDataBaseAndIdDocument(
+            @PathVariable String databaseName,
+            @PathVariable String collectionname
+    ) throws IOException {
+        return crudOperation.findCollectionByDataBaseAndName(databaseName, collectionname)
+                .getDocuments()
+                .countAll();
+    }
+
+    @GetMapping("/{databaseName}/collection/{collectionname}/existsById/{id}")
+    public Mono<Boolean> existsAllDocumentByCollectionAndDataBaseAndIdDocument(
+            @PathVariable String databaseName,
+            @PathVariable String collectionname,
+            @PathVariable String id
+    ) throws IOException {
+        return crudOperation.findCollectionByDataBaseAndName(databaseName, collectionname)
+                .getDocuments()
+                .existsById(id);
+    }
+
+    @PostMapping("/{database}")
+    public Mono createDatabase(@PathVariable String database){
+        return crudOperation.createDataBase(database);
+    }
+
+    @PostMapping("/{database}/collection")
+    public Mono createCollection(@PathVariable String database,
+                                 @RequestBody Collection collection){
+        DataBase dataBase = new DataBase();
+        dataBase.setPath(path);
+        dataBase.setName(database);
+        dataBase.setDate(new Date());
+        return crudOperation.createCollection(dataBase, collection.getName(), collection.getDescription());
+    }
+
+    @PostMapping("/{database}/collection/{collection}/document")
+    public Mono createDocument(@PathVariable String database,
+                               @PathVariable String collection,
+                               @RequestBody Document document) throws IOException {
+        DataBase dataBase = new DataBase();
+        dataBase.setPath(path);
+        dataBase.setName(database);
+        dataBase.setDate(new Date());
+        Collection collection1 = crudOperation.findCollectionByDataBaseAndName(database, collection);
+        return crudOperation.createDocument(dataBase, collection1, document);
     }
 
     /* Remover datos de la base de datos */
@@ -82,6 +134,7 @@ public class OperationController {
         return crudOperation.dropDataBase(dataBase);
     }
 
+    /* Remover colecciones*/
     @DeleteMapping("/{database}/collection/{collection}")
     public Mono removeCollection(
             @PathVariable String database,
@@ -97,8 +150,9 @@ public class OperationController {
         return crudOperation.dropColection(dataBase, collection1);
     }
 
+    /* Remover documentos*/
     @DeleteMapping("/{database}/collection/{collection}/document/{document}")
-    public Mono removeCollection(
+    public Mono removeDocument(
             @PathVariable String database,
             @PathVariable String collection,
             @PathVariable String document
@@ -109,11 +163,8 @@ public class OperationController {
         dataBase.setDate(new Date());
 
         Collection collection1 = crudOperation.findCollectionByDataBaseAndName(database, collection);
-
         Document document1 = new Document();
-
         document1.put("_id", document);
-
         return crudOperation.dropDocument(dataBase, collection1, document1);
     }
 }
